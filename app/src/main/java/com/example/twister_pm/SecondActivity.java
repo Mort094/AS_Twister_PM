@@ -4,12 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +28,14 @@ public class SecondActivity extends AppCompatActivity {
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
     public static final String MESSAGE = "message";
+    private TextView messageView;
+    private FirebaseAuth mAuth;
     private final List<Message> messagesList = new ArrayList<>();
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("https://anbo-restmessages.azurewebsites.net/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+    AnboService service = retrofit.create(AnboService.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +43,9 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getAndShowData();
+
+        messageView = findViewById(R.id.messageView);
+        mAuth = FirebaseAuth.getInstance();
         /*FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,13 +61,14 @@ public class SecondActivity extends AppCompatActivity {
         emailView.setText(email);
     }
 
-    private void getAndShowData() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getAndShowData();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://anbo-restmessages.azurewebsites.net/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        AnboService service = retrofit.create(AnboService.class);
+    }
+
+    private void getAndShowData() {
 
         Call<List<Message>> callMessage = service.getMessage();
         callMessage.enqueue(new Callback<List<Message>>() {
@@ -68,6 +82,34 @@ public class SecondActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Message>> call, Throwable t) {
                 Log.d("apple", t.getMessage());
+            }
+        });
+    }
+    public void sendMessage(View view){
+        EditText contentField = findViewById(R.id.messageContent);
+        String content = contentField.getText().toString().trim();
+
+        Message message = new Message();
+        message.setContent(content);
+        message.setUser(mAuth.getCurrentUser().getEmail());
+        Call<Message> saveMessageCall = service.saveMessage(message);
+        saveMessageCall.enqueue(new Callback<Message>() {
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+                if (response.isSuccessful()){
+                    Message theNewMessage = response.body();
+                    Log.d("apple", theNewMessage.toString());
+                    Toast.makeText(SecondActivity.this, "Message added: " + theNewMessage.getId(), Toast.LENGTH_SHORT).show();
+                }else {
+                    String problem = "Problem: " + response.code() + " " + response.message();
+                    Log.e("apple", problem);
+                    messageView.setText("Problem");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+
             }
         });
     }

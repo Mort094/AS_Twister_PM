@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
     private GestureDetector gestureDetector;
 
     private FirebaseAuth mAuth;
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("https://anbo-restmessages.azurewebsites.net/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+    AnboService service = retrofit.create(AnboService.class);
 
 
     @Override
@@ -57,6 +64,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
 
         getAndShowData();
 
+
         /*FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,13 +76,6 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
     }
 
     private void getAndShowData() {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://anbo-restmessages.azurewebsites.net/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        AnboService service = retrofit.create(AnboService.class);
-
 
         Call<List<Comment>> callComment = service.getComment(originalMessage.getId());
         callComment.enqueue(new Callback<List<Comment>>() {
@@ -114,13 +115,6 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         comment.setMessageId(originalMessage.getId());
 
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://anbo-restmessages.azurewebsites.net/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        AnboService service = retrofit.create(AnboService.class);
-
         Call<Comment> saveCommentCall = service.saveComment(originalMessage.getId(), comment);
         Log.d("ananas", comment.toString());
 
@@ -148,6 +142,43 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         });
 
     }
+
+    public void deleteMessage(View view )
+    {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        Log.d("apple", "currentUser: " + currentUser.getEmail());
+        Log.d("apple","originalMessage " + originalMessage.getUser());
+        if (!currentUser.getEmail() .equals(originalMessage.getUser())){
+                Toast.makeText(getBaseContext(),
+                 "Can not delete others messages",
+                  Toast.LENGTH_SHORT).show();
+            return;
+    }
+
+        int messageId = originalMessage.getId();
+        Call<Message> deleteMessageCall = service.deleteMessage(messageId);
+
+        deleteMessageCall.enqueue(new Callback<Message>() {
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+                if (response.isSuccessful()){
+                    Log.d("apple", "Virker det");
+                   finish();
+                }else {
+                    String problem = call.request().url() + "\n" + response.code() + " " + response.message();
+                    messageView.setText(problem);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+                Log.e(LOG_TAG, "Problem: " + t.getMessage());
+            }
+        });
+    }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
