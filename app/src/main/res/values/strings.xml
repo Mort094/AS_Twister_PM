@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Twister PM</string>
+    <string name="welcomeText">Welcome to Twister</string>
+    <string name="frontPageText">The place for positive atmosphere</string>
+    <string name="loginEmail">Email</string>
+    <string name="loginPassword">Password</string>
+    <string name="orCreate">Or create a user</string>
+    <string name="title_activity_second">SecondActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_comment">commentActivity</string>
+</resources>
