@@ -3,11 +3,15 @@ package com.example.twister_pm;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SecondActivity extends AppCompatActivity {
+    private ShareActionProvider shareActionProvider;
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
     public static final String MESSAGE = "message";
@@ -67,6 +72,29 @@ public class SecondActivity extends AppCompatActivity {
         getAndShowData();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_logout:
+                logout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+    }
+    public void logout(){
+        mAuth.signOut();
+        Toast.makeText(SecondActivity.this, "You are now logged out!", Toast.LENGTH_LONG).show();
+    };
 
     private void getAndShowData() {
 

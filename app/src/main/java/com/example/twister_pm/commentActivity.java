@@ -65,7 +65,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         getAndShowData();
 
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
+       /* FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,6 +74,8 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
             }
         });*/
     }
+
+
 
     private void getAndShowData() {
 
@@ -154,6 +156,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
                   Toast.LENGTH_SHORT).show();
             return;
     }
+
 
         int messageId = originalMessage.getId();
         Call<Message> deleteMessageCall = service.deleteMessage(messageId);
