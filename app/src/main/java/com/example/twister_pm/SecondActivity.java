@@ -94,6 +94,12 @@ public class SecondActivity extends AppCompatActivity {
     public void logout(){
         mAuth.signOut();
         Toast.makeText(SecondActivity.this, "You are now logged out!", Toast.LENGTH_LONG).show();
+
+        Intent i = new Intent(SecondActivity.this, MainActivity.class);        // Specify any activity here e.g. home or splash or login etc
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+        finish();
     };
 
     private void getAndShowData() {

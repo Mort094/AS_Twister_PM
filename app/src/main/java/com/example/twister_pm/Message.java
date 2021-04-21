@@ -57,7 +57,7 @@ public class Message implements Serializable
 
     @Override
    public String toString() {
-       return "id: " + id + " content: " + content + " user: " + user + " comments " + totalComments;
+       return " id: " + id + "\n content: " + content + "\n user: " + user + "\n comments: " + totalComments + "\n ";
     }
 
 }

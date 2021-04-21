@@ -55,6 +55,6 @@ public class Comment implements Serializable
     }
     @Override
     public String toString() {
-        return " user: " + user + " content: " + content + " messageId " + messageId;
+        return " user: " + user + "\n content: " + content + "\n messageId " + messageId + "\n";
     }
 }
