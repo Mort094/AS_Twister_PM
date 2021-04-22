@@ -127,7 +127,8 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
                     Comment theNewComment = response.body();
                     Log.d("apple", theNewComment.toString());
                     Toast.makeText(commentActivity.this, "Comment added, id: "+ theNewComment.getId(), Toast.LENGTH_LONG).show();
-
+                    getAndShowData();
+                    commentField.getText().clear();
                 }
                 else {
                     String problem = "Problem: " + response.code() + " " + response.message();

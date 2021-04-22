@@ -134,6 +134,8 @@ public class SecondActivity extends AppCompatActivity {
                     Message theNewMessage = response.body();
                     Log.d("apple", theNewMessage.toString());
                     Toast.makeText(SecondActivity.this, "Message added: " + theNewMessage.getId(), Toast.LENGTH_SHORT).show();
+                    getAndShowData();
+                    contentField.getText().clear();
                 }else {
                     String problem = "Problem: " + response.code() + " " + response.message();
                     Log.e("apple", problem);
