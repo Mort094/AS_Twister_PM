@@ -63,9 +63,6 @@ public class CommentActivity extends AppCompatActivity implements GestureDetecto
         Intent intent = getIntent();
         originalMessage = (Message) intent.getSerializableExtra(MESSAGE);
 
-        //comment = new Comment();
-        //comment = (Comment);
-
         TextView heading = findViewById(R.id.commentHeading);
         heading.setText(originalMessage.getContent());
 
