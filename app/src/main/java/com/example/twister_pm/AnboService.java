@@ -24,4 +24,7 @@ public interface AnboService {
 
     @DELETE("Messages/{id}")
     Call<Message> deleteMessage(@Path("id") int id);
+
+    @DELETE("messages/{messageId}/comments/{commentId}")
+    Call<Comment> deleteComment(@Path("messageId") int messageId, @Path("commentId") int id);
 }

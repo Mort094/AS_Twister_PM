@@ -28,11 +28,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SecondActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity {
     private ShareActionProvider shareActionProvider;
     public static final String EMAIL = "email";
-    public static final String PASSWORD = "password";
-    public static final String MESSAGE = "message";
+
     private TextView messageView;
     private FirebaseAuth mAuth;
     private final List<Message> messagesList = new ArrayList<>();
@@ -61,8 +60,8 @@ public class SecondActivity extends AppCompatActivity {
         }); */
 
         Intent userData = getIntent();
-        String email = userData.getStringExtra(EMAIL);
         TextView emailView = findViewById(R.id.secondEmailView);
+        String email = userData.getStringExtra(EMAIL);
         emailView.setText(email);
     }
 
@@ -93,9 +92,9 @@ public class SecondActivity extends AppCompatActivity {
     }
     public void logout(){
         mAuth.signOut();
-        Toast.makeText(SecondActivity.this, "You are now logged out!", Toast.LENGTH_LONG).show();
+        Toast.makeText(MessageActivity.this, "You are now logged out!", Toast.LENGTH_LONG).show();
 
-        Intent i = new Intent(SecondActivity.this, MainActivity.class);        // Specify any activity here e.g. home or splash or login etc
+        Intent i = new Intent(MessageActivity.this, MainActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
@@ -133,7 +132,7 @@ public class SecondActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Message theNewMessage = response.body();
                     Log.d("apple", theNewMessage.toString());
-                    Toast.makeText(SecondActivity.this, "Message added: " + theNewMessage.getId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MessageActivity.this, "Message added: " + theNewMessage.getId(), Toast.LENGTH_SHORT).show();
                     getAndShowData();
                     contentField.getText().clear();
                 }else {
@@ -156,12 +155,13 @@ public class SecondActivity extends AppCompatActivity {
         RecyclerViewSimpleAdapter<Message> adapter = new RecyclerViewSimpleAdapter<>(messages);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
         Log.d("banana", messages.toString());
         adapter.setOnItemClickListener(new RecyclerViewSimpleAdapter.OnItemClickListener<Message>() {
             @Override
             public void onItemClick(View view, int position, Message element) {
-                Intent intent = new Intent(getBaseContext(), commentActivity.class);
-                intent.putExtra(commentActivity.MESSAGE, element);
+                Intent intent = new Intent(getBaseContext(), CommentActivity.class);
+                intent.putExtra(CommentActivity.MESSAGE, element);
                 startActivity(intent);
             }
         });

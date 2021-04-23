@@ -1,11 +1,13 @@
 package com.example.twister_pm;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,13 +28,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class commentActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
+public class CommentActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
     private static final String LOG_TAG = "APPLE";
     public static final String MESSAGE = "comment";
     private TextView messageView;
     private Message originalMessage;
     private GestureDetector gestureDetector;
+    private Comment clickComment;
+
 
     private FirebaseAuth mAuth;
     Retrofit retrofit = new Retrofit.Builder()
@@ -41,7 +45,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
             .build();
 
     AnboService service = retrofit.create(AnboService.class);
-
+    Dialog myDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +63,15 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         Intent intent = getIntent();
         originalMessage = (Message) intent.getSerializableExtra(MESSAGE);
 
+        //comment = new Comment();
+        //comment = (Comment);
+
         TextView heading = findViewById(R.id.commentHeading);
         heading.setText(originalMessage.getContent());
 
         getAndShowData();
 
+        myDialog = new Dialog(this);
 
        /* FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +81,33 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
                         .setAction("Action", null).show();
             }
         });*/
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getAndShowData();
+    }
+
+    public void showPopUp(View view){
+        TextView txtClose;
+        TextView text;
+        Button btnDelete;
+        myDialog.setContentView(R.layout.custompopup);
+        txtClose = (TextView) myDialog.findViewById(R.id.txtClose);
+        btnDelete = (Button) myDialog.findViewById(R.id.btnDelete);
+        text = (TextView) myDialog.findViewById(R.id.commentText);
+        text.setText(clickComment.getContent());
+
+        txtClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myDialog.dismiss();
+            }
+        });
+
+        myDialog.show();
+
     }
 
 
@@ -102,6 +137,13 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         Log.d("banana", comments.toString());
+        adapter.setOnItemClickListener(new RecyclerViewSimpleAdapter.OnItemClickListener<Comment>() {
+            @Override
+            public void onItemClick(View view, int position, Comment element) {
+                clickComment = element;
+                showPopUp(view);
+            }
+        });
 
     }
 
@@ -126,7 +168,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
                 if (response.isSuccessful()){
                     Comment theNewComment = response.body();
                     Log.d("apple", theNewComment.toString());
-                    Toast.makeText(commentActivity.this, "Comment added, id: "+ theNewComment.getId(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(CommentActivity.this, "Comment added, id: "+ theNewComment.getId(), Toast.LENGTH_LONG).show();
                     getAndShowData();
                     commentField.getText().clear();
                 }
@@ -146,7 +188,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
 
     }
 
-    public void deleteMessage(View view )
+    public void deleteMessage(View view)
     {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         Log.d("apple", "currentUser: " + currentUser.getEmail());
@@ -156,7 +198,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
                  "Can not delete others messages",
                   Toast.LENGTH_SHORT).show();
             return;
-    }
+        }
 
 
         int messageId = originalMessage.getId();
@@ -219,7 +261,7 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
         boolean rightSwipe = e1.getX() < e2.getX();
         Log.d(LOG_TAG, "onFling right: " + rightSwipe);
         if (rightSwipe) {
-            Intent intent = new Intent(this, SecondActivity.class);
+            Intent intent = new Intent(this, MessageActivity.class);
             startActivity(intent);
         }
         return true;
@@ -227,6 +269,43 @@ public class commentActivity extends AppCompatActivity implements GestureDetecto
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    public void deleteComment(View view) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        Log.d("apple", "currentUser: " + currentUser.getEmail());
+        Log.d("apple","originalMessage " + clickComment.getUser());
+        if (!currentUser.getEmail() .equals(clickComment.getUser())){
+            Toast.makeText(getBaseContext(),
+                    "Can not delete others comments",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int messageId = originalMessage.getId();
+        int commentId = clickComment.getId();
+        Call<Comment> deleteCommentCall = service.deleteComment(messageId, commentId);
+
+        deleteCommentCall.enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                if (response.isSuccessful()){
+                    Log.d("apple", "Virker det");
+                    Toast.makeText(getBaseContext(),
+                            "Comment deleted",Toast.LENGTH_SHORT).show();
+                    getAndShowData();
+                }else {
+                    String problem = call.request().url() + "\n" + response.code() + " " + response.message();
+                    messageView.setText(problem);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Log.e(LOG_TAG, "Problem: " + t.getMessage());
+            }
+        });
 
     }
 }

@@ -12,12 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Twister_PM"
         android:usesCleartextTraffic="true">
+        <activity android:name=".DeleteCommentActivity"></activity>
         <activity
-            android:name=".commentActivity"
+            android:name=".DeleteComment"
+            android:label="@string/title_activity_delete_comment"
+            android:theme="@style/Theme.Twister_PM.NoActionBar" />
+        <activity
+            android:name=".CommentActivity"
             android:label="@string/title_activity_comment"
-            android:theme="@style/Theme.Twister_PM.NoActionBar"></activity>
+            android:theme="@style/Theme.Twister_PM.NoActionBar" />
         <activity
-            android:name=".SecondActivity"
+            android:name=".MessageActivity"
             android:label="@string/title_activity_second"
             android:theme="@style/Theme.Twister_PM.NoActionBar" />
         <activity android:name=".MainActivity">
